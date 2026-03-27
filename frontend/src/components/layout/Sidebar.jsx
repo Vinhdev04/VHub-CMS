@@ -5,6 +5,11 @@ const { Sider } = Layout;
 const { Text } = Typography;
 
 function Sidebar({ activeKey }) {
+  const menuItems = sidebarMenu.map((item) => ({
+    ...item,
+    icon: <item.icon />,
+  }));
+
   return (
     <Sider width={250} className="app-sidebar">
       <div className="brand">
@@ -17,7 +22,7 @@ function Sidebar({ activeKey }) {
       <Menu
         mode="inline"
         selectedKeys={[activeKey]}
-        items={sidebarMenu}
+        items={menuItems}
         className="sidebar-menu"
       />
     </Sider>
