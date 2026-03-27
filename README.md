@@ -66,3 +66,7 @@ npm run dev
 - `POST /api/projects`
 - `PUT /api/projects/:id`
 - `DELETE /api/projects/:id`
+- `GET /api/blog-posts`
+- `POST /api/blog-posts`
+- `PUT /api/blog-posts/:id`
+- `DELETE /api/blog-posts/:id`

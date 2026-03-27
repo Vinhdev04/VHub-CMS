@@ -4,7 +4,7 @@ import { sidebarMenu } from "../../shared/config/menu.config";
 const { Sider } = Layout;
 const { Text } = Typography;
 
-function Sidebar({ activeKey }) {
+function Sidebar({ activeKey, onChange }) {
   const menuItems = sidebarMenu.map((item) => ({
     ...item,
     icon: <item.icon />,
@@ -24,6 +24,7 @@ function Sidebar({ activeKey }) {
         selectedKeys={[activeKey]}
         items={menuItems}
         className="sidebar-menu"
+        onClick={({ key }) => onChange?.(key)}
       />
     </Sider>
   );

@@ -4,10 +4,10 @@ import TopHeader from "../components/layout/TopHeader";
 
 const { Content } = Layout;
 
-function AdminLayout({ children, activeKey }) {
+function AdminLayout({ children, activeKey, onMenuChange }) {
   return (
     <Layout className="app-layout">
-      <Sidebar activeKey={activeKey} />
+      <Sidebar activeKey={activeKey} onChange={onMenuChange} />
       <Layout>
         <TopHeader />
         <Content className="app-content">{children}</Content>

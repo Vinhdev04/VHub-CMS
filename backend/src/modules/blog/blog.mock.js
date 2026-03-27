@@ -1,0 +1,32 @@
+export const mockBlogPosts = [
+  {
+    id: "b1",
+    title: "Building Scalable APIs with Node.js",
+    excerpt: "Kinh nghiệm thiết kế REST API cho hệ thống production với Node.js.",
+    tags: ["Node.js", "Backend"],
+    views: 4820,
+    likes: 312,
+    status: "Published",
+    readTime: "9 phút",
+  },
+  {
+    id: "b2",
+    title: "React 19 New Features: A Deep Dive",
+    excerpt: "Tổng hợp các thay đổi quan trọng trong React 19 và cách áp dụng.",
+    tags: ["React", "Frontend"],
+    views: 7314,
+    likes: 618,
+    status: "Published",
+    readTime: "12 phút",
+  },
+  {
+    id: "b3",
+    title: "Mastering TypeScript Generics",
+    excerpt: "Mẹo sử dụng generics để viết code an toàn và tái sử dụng cao.",
+    tags: ["TypeScript", "Programming"],
+    views: 0,
+    likes: 0,
+    status: "Draft",
+    readTime: "10 phút",
+  },
+];
