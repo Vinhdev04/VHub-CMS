@@ -10,3 +10,46 @@ export async function getProjects() {
   const payload = await response.json();
   return payload?.data || [];
 }
+
+export async function createProject(projectPayload) {
+  const response = await fetch(`${API_BASE_URL}/api/projects`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(projectPayload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Không thể tạo dự án mới.");
+  }
+
+  const payload = await response.json();
+  return payload?.data;
+}
+
+export async function updateProject(projectId, projectPayload) {
+  const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(projectPayload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Không thể cập nhật dự án.");
+  }
+
+  const payload = await response.json();
+  return payload?.data;
+}
+
+export async function deleteProject(projectId) {
+  const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Không thể xóa dự án.");
+  }
+
+  const payload = await response.json();
+  return payload?.data;
+}

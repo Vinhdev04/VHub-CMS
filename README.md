@@ -63,3 +63,6 @@ npm run dev
 
 - `GET /health`
 - `GET /api/projects`
+- `POST /api/projects`
+- `PUT /api/projects/:id`
+- `DELETE /api/projects/:id`

@@ -5,11 +5,11 @@ import {
   LinkOutlined,
   StarFilled,
 } from "@ant-design/icons";
-import { Button, Card, Space, Tag, Typography } from "antd";
+import { Button, Card, Popconfirm, Space, Tag, Typography } from "antd";
 
 const { Paragraph, Title } = Typography;
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, onEdit, onDelete }) {
   return (
     <Card
       className="project-card"
@@ -36,8 +36,16 @@ function ProjectCard({ project }) {
           Live Demo
         </Button>
         <Button icon={<GithubOutlined />} href={project.githubUrl} />
-        <Button icon={<EditOutlined />} />
-        <Button danger icon={<DeleteOutlined />} />
+        <Button icon={<EditOutlined />} onClick={() => onEdit?.(project)} />
+        <Popconfirm
+          title="Xóa dự án này?"
+          description="Thao tác này không thể hoàn tác."
+          okText="Xóa"
+          cancelText="Hủy"
+          onConfirm={() => onDelete?.(project.id)}
+        >
+          <Button danger icon={<DeleteOutlined />} />
+        </Popconfirm>
       </div>
     </Card>
   );

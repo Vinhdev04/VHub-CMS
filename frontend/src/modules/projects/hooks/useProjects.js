@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { getProjects } from "../services/projects.service";
+import {
+  createProject,
+  deleteProject,
+  getProjects,
+  updateProject,
+} from "../services/projects.service";
 
 export function useProjects() {
   const [projects, setProjects] = useState([]);
@@ -7,29 +12,44 @@ export function useProjects() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let mounted = true;
-    getProjects()
-      .then((data) => {
-        if (mounted) {
-          setProjects(data);
-          setError("");
-        }
-      })
-      .catch((err) => {
-        if (mounted) {
-          setError(err.message || "Đã có lỗi khi tải danh sách dự án.");
-        }
-      })
-      .finally(() => {
-        if (mounted) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
+    fetchProjects();
   }, []);
 
-  return { projects, loading, error };
+  async function fetchProjects() {
+    setLoading(true);
+    try {
+      const data = await getProjects();
+      setProjects(data);
+      setError("");
+    } catch (err) {
+      setError(err.message || "Đã có lỗi khi tải danh sách dự án.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function createProjectItem(projectPayload) {
+    await createProject(projectPayload);
+    await fetchProjects();
+  }
+
+  async function updateProjectItem(projectId, projectPayload) {
+    await updateProject(projectId, projectPayload);
+    await fetchProjects();
+  }
+
+  async function deleteProjectItem(projectId) {
+    await deleteProject(projectId);
+    await fetchProjects();
+  }
+
+  return {
+    projects,
+    loading,
+    error,
+    fetchProjects,
+    createProjectItem,
+    updateProjectItem,
+    deleteProjectItem,
+  };
 }
