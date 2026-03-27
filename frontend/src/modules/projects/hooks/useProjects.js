@@ -4,6 +4,7 @@ import { getProjects } from "../services/projects.service";
 export function useProjects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -11,6 +12,12 @@ export function useProjects() {
       .then((data) => {
         if (mounted) {
           setProjects(data);
+          setError("");
+        }
+      })
+      .catch((err) => {
+        if (mounted) {
+          setError(err.message || "Đã có lỗi khi tải danh sách dự án.");
         }
       })
       .finally(() => {
@@ -24,5 +31,5 @@ export function useProjects() {
     };
   }, []);
 
-  return { projects, loading };
+  return { projects, loading, error };
 }

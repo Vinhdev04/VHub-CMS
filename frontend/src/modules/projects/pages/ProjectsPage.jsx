@@ -1,11 +1,11 @@
-import { Card, Col, Row, Statistic, Typography } from "antd";
+import { Alert, Card, Col, Row, Statistic, Typography } from "antd";
 import ProjectsGrid from "../components/ProjectsGrid";
 import { useProjects } from "../hooks/useProjects";
 
 const { Title } = Typography;
 
 function ProjectsPage() {
-  const { projects, loading } = useProjects();
+  const { projects, loading, error } = useProjects();
   const liveProjects = projects.filter((item) => item.status === "Live").length;
   const totalStars = projects.reduce((sum, item) => sum + item.stars, 0);
 
@@ -30,6 +30,15 @@ function ProjectsPage() {
           </Card>
         </Col>
       </Row>
+
+      {error ? (
+        <Alert
+          type="error"
+          showIcon
+          message={error}
+          style={{ marginBottom: 16 }}
+        />
+      ) : null}
 
       <ProjectsGrid projects={projects} loading={loading} />
     </div>

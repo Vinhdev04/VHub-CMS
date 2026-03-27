@@ -16,7 +16,7 @@ frontend/
     layouts/                # Page-level layout containers
     modules/projects/       # Feature module: projects
       components/           # UI components of module
-      data/                 # Mock data / static resources
+      data/                 # Static resources (if needed)
       hooks/                # React hooks for module logic
       pages/                # Screen-level components
       services/             # API/data service layer
@@ -41,6 +41,7 @@ backend/
 ```bash
 cd frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -52,6 +53,11 @@ npm install
 cp .env.example .env
 npm run dev
 ```
+
+## Notes
+
+- Frontend gọi API thật qua `VITE_API_BASE_URL` (mặc định `http://localhost:4000`).
+- Nếu chưa cấu hình Supabase, backend sẽ tự fallback dữ liệu mẫu để UI vẫn hoạt động khi dev.
 
 ## API
 
