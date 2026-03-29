@@ -75,3 +75,7 @@ export async function updateProject(id, data) {
 export async function deleteProject(id) {
   return request(`/projects/${id}`, { method: 'DELETE' });
 }
+
+export async function getGitHubRepos(username) {
+  return request(`/projects/github-repos?username=${encodeURIComponent(username)}`);
+}

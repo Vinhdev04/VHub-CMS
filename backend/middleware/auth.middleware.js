@@ -46,9 +46,40 @@ export async function authMiddleware(req, res, next) {
     }
 
     const normalizedEmail = extractSupabaseEmail(user);
-    if (!isAdminEmail(normalizedEmail)) {
-      console.warn(`[AUTH] Truy cập bị từ chối cho email: ${normalizedEmail}. Vui lòng thêm email này vào ADMIN_EMAILS trong file .env.`);
-      return res.status(403).json({ ok: false, message: 'Tai khoan nay khong co quyen admin.' });
+    if (!normalizedEmail) return res.status(401).json({ ok: false, message: 'Authorization error: No email found' });
+
+    let isAdmin = isAdminEmail(normalizedEmail);
+    let isViewer = false;
+
+    // Bổ sung kiểm tra từ Database nếu không có trong .env
+    if (hasFirebaseConfig) {
+        try {
+            const { db } = await import('../lib/firebase.js');
+            const personnelSnap = await db.collection('personnel')
+                .where('email', '==', normalizedEmail)
+                .get();
+            
+            if (!personnelSnap.empty) {
+                const userData = personnelSnap.docs[0].data();
+                if (userData.role === 'Administrator') {
+                    isAdmin = true;
+                } else if (userData.role === 'Viewer') {
+                    isViewer = true;
+                }
+            }
+        } catch (dbErr) {
+            console.error('[AUTH] Lỗi kiểm tra database role:', dbErr.message);
+        }
+    }
+
+    // Nếu là Viewer, chỉ cho phép các method đọc (GET)
+    if (isViewer && req.method !== 'GET') {
+        return res.status(403).json({ ok: false, message: 'Tai khoan Demo chi co quyen xem, khong the thay doi du lieu.' });
+    }
+
+    if (!isAdmin && !isViewer) {
+      console.warn(`[AUTH] Truy cập bị từ chối cho email: ${normalizedEmail}.`);
+      return res.status(403).json({ ok: false, message: 'Tai khoan nay khong co quyen truy cap Dashboard.' });
     }
 
     req.user = {

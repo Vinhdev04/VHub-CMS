@@ -30,16 +30,45 @@ export async function adminLoginController(req, res, next) {
       return res.status(400).json({ ok: false, message: 'Mat khau phai co it nhat 8 ky tu.' });
     }
 
-    if (!hasAdminConfig) {
-      return res.status(503).json({ ok: false, message: 'Tai khoan admin chua duoc cau hinh.' });
+    // 1. Kiểm tra cấu hình trong .env (Root Admin)
+    const isRootAdmin = isAdminEmail(email) && password === env.adminPassword;
+    
+    // 2. Kiểm tra trong Database (Personnel collection)
+    let dbUser = null;
+    try {
+        const { db } = await import('../lib/firebase.js');
+        const personnelSnap = await db.collection('personnel')
+            .where('email', '==', email)
+            .get();
+        
+        if (!personnelSnap.empty) {
+            dbUser = personnelSnap.docs[0].data();
+            // Nếu là tài khoản Demo, cho phép mật khẩu mặc định nếu .env chưa cấu hình
+            if (dbUser.role === 'Viewer' && password === 'demo123456') {
+                // OK
+            } else if (password !== env.adminPassword) {
+                dbUser = null; // Sai mật khẩu
+            }
+        }
+    } catch (err) {
+        console.error('[AUTH] Lỗi truy vấn database login:', err.message);
     }
 
-    if (!isAdminEmail(email) || password !== env.adminPassword) {
+    if (!isRootAdmin && !dbUser) {
       return res.status(401).json({ ok: false, message: 'Sai thong tin dang nhap admin.' });
     }
 
-    const profile = await getUserProfile(normalizeAdminUser(email));
-    return res.json(successResponse(profile, 'Dang nhap admin thanh cong'));
+    const userData = dbUser ? {
+        id: dbUser.id || `admin:${email}`,
+        email: email,
+        name: dbUser.name || 'User',
+        role: dbUser.role || 'Administrator',
+        avatar: dbUser.avatar || '',
+        provider: 'email'
+    } : normalizeAdminUser(email);
+
+    const profile = await getUserProfile(userData);
+    return res.json(successResponse(profile, 'Dang nhap thanh cong'));
   } catch (error) {
     return next(error);
   }

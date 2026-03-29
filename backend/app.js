@@ -11,6 +11,10 @@ const __dirname = path.dirname(__filename);
 const frontendDistPath = path.resolve(__dirname, '../frontend/dist');
 
 app.use(cors());
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Private-Network', 'true');
+  next();
+});
 app.use(express.json());
 
 app.get('/health', (_req, res) => {

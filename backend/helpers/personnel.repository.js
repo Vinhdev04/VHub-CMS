@@ -45,7 +45,7 @@ export async function findAllPersonnel() {
   if (!hasFirebaseConfig || !db) return localPersonnel;
 
   try {
-    const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
+    const snapshot = await db.collection(COLLECTION).get();
     return snapshot.docs.map((doc) => normalize({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.warn(`[FIREBASE] Fallback to local personnel list: ${error.message}`);

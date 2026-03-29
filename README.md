@@ -1,283 +1,80 @@
-# VHub CMS Dashboard
+# 🚀 VHub-CMS: Ready-to-use Developer Content Management System
 
-Boilerplate fullstack CMS admin dashboard for developer portfolio.
+![VHub-CMS Dashboard](/frontend/src/assets/images/devCMS.png)
 
-## Stack
+VHub-CMS là một hệ thống quản trị nội dung hiện đại dành riêng cho các Developer, được tối ưu hóa để quản lý Portfolio dự án, bài đăng Blog (với tính năng đồng bộ TikTok) và thông tin nhân sự.
 
-- Frontend: ReactJS + Ant Design + CSS
-- Backend: NodeJS (Express) + Supabase
+---
 
-## Folder Structure
+## 🔗 Project Links
+- **GitHub Repository**: [https://github.com/Vinhdev04/VHub-CMS](https://github.com/Vinhdev04/VHub-CMS)
+- **Live Preview**: [https://vhub-cms.netlify.app/](https://vhub-cms.netlify.app/)
 
-```text
-frontend/
-  src/
-    components/layout/      # Reusable UI layout blocks
-    layouts/                # Page-level layout containers
-    modules/projects/       # Feature module: projects
-      components/           # UI components of module
-      data/                 # Static resources (if needed)
-      hooks/                # React hooks for module logic
-      pages/                # Screen-level components
-      services/             # API/data service layer
-    shared/config/          # App configuration
-    styles/                 # Global stylesheet
+---
 
-backend/
-  config/                   # Environment config
-  controller/               # Route controllers
-  helpers/                  # Services, repositories, mocks
-  lib/                      # Firebase and Supabase clients
-  middleware/               # App middlewares
-  routes/                   # Express routes
-```
+## 🌟 Chức năng nổi bật
 
-## Run Frontend
+### 1. Project Project Intelligence Hub
+Hệ thống báo cáo dự án chuyên sâu giúp theo dõi hiệu suất phát triển:
+- **Repo Analytics**: Thống kê Commits, lượt Views, Stars và độ phủ Documentation.
+- **Impact Index**: Đánh giá sức ảnh hưởng của repo qua biểu đồ đa chiều.
+- **Real-time Engine**: Dữ liệu đồng bộ tức thì với Firebase Firestore.
 
-```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
-```
+### 2. TikTok Content Sync 2.0
+Đồng bộ bài viết blog từ TikTok một cách chuyên nghiệp:
+- **Dynamic Pull**: Chọn số lượng video muốn lấy về (Qty: 1 - 50).
+- **Auto-Formatting**: Nội dung video tiktok được chuyển đổi sang định dạng Blog Hub cao cấp.
+- **Premium Reader**: Giao diện xem bài viết tích hợp Video demo, Image Gallery và Comment section.
 
-## Run Backend
+### 3. Personnel Control & Security
+Quản lý nhân sự và phân quyền người dùng linh hoạt:
+- **Admin Access**: Kiểm tra quyền quản trị qua email tĩnh hoặc database động.
+- **Viewer Role (Demo Mode)**: Chế độ chỉ xem cho khách tham quan, bảo vệ dữ liệu gốc khỏi thay đổi trái phép.
 
-```bash
-cd backend
-npm install
-cp .env.example .env
-npm run dev
-```
+---
 
-## Notes
+## 🔐 Tài khoản Trải nghiệm (Demo)
 
-- Frontend gọi API thật qua `VITE_API_BASE_URL` (mặc định `http://localhost:4000`).
-- Nếu chưa cấu hình Supabase, backend sẽ tự fallback dữ liệu mẫu để UI vẫn hoạt động khi dev.
+Bạn có thể đăng nhập vào hệ thống để trải nghiệm giao diện quản trị với quyền **Chỉ xem (Read-only)**:
 
-## API
+- **Email**: `demo@vhub.io`
+- **Mật khẩu**: `demo123456`
 
-- `GET /health`
-- `GET /api/projects`
-- `POST /api/projects`
-- `PUT /api/projects/:id`
-- `DELETE /api/projects/:id`
-- `GET /api/blog-posts`
-- `POST /api/blog-posts`
-- `PUT /api/blog-posts/:id`
-- `DELETE /api/blog-posts/:id`
+*(Lưu ý: Chế độ demo không cho phép Thay đổi/Xoá dữ liệu để bảo vệ tính nhất quán của môi trường dùng thử).*
 
-## Docker
+---
 
-Build image:
+## 🏗️ Công nghệ sử dụng
 
-```bash
-docker build -t vhub-cms .
-```
+- **Frontend**: React 19, Vite, Ant Design 5.x, Framer Motion, Recharts.
+- **Backend**: Node.js, Express, Firebase Firestore (NoSQL).
+- **Authentication**: Firebase Auth (Google, GitHub, Email).
+- **Infrastructure**: Supabase (Storage), GitHub Actions, Netlify.
 
-Run container:
+---
 
-```bash
-docker run -p 4000:4000 --env-file backend/.env vhub-cms
-```
+## 🛠️ Hướng dẫn cài đặt
 
-Run with Docker Compose:
+1. **Clone Repo**:
+   ```bash
+   git clone https://github.com/Vinhdev04/VHub-CMS.git
+   ```
 
-```bash
-docker compose up --build
-```
+2. **Cài đặt Dependency**:
+   ```bash
+   # Backend
+   cd backend && npm install
+   # Frontend
+   cd ../frontend && npm install
+   ```
 
-## Docker Hub
+3. **Cấu hình Môi trường**: Tạo file `.env` theo `example.env` và điền cấu hình Firebase của bạn.
 
-Login:
+4. **Kích hoạt Dữ liệu mẫu**:
+   ```bash
+   cd backend && node scripts/seed.js
+   ```
 
-```bash
-docker login
-```
+---
 
-Tag image:
-
-```bash
-docker tag vhub-cms <dockerhub-username>/vhub-cms:latest
-```
-
-Push image:
-
-```bash
-docker push <dockerhub-username>/vhub-cms:latest
-```
-
-Example CI/CD flow:
-
-```bash
-docker build -t <dockerhub-username>/vhub-cms:latest .
-docker push <dockerhub-username>/vhub-cms:latest
-```
-
-## Supabase Auth Setup
-
-Update local env:
-
-```bash
-backend/.env
-frontend/.env
-```
-
-Required values:
-
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_publishable_key
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your_publishable_key
-ADMIN_EMAIL=your-admin-email@example.com
-```
-
-### Google Provider
-
-1. Open Supabase Dashboard.
-2. Go to `Authentication` -> `Providers`.
-3. Enable `Google`.
-4. In Google Cloud Console, create OAuth credentials for Web application.
-5. Add Supabase callback URL shown in provider screen into Google OAuth redirect URIs.
-6. Copy `Client ID` and `Client Secret` from Google Cloud into Supabase Google provider form.
-7. Save provider config.
-
-### GitHub Provider
-
-1. Open Supabase Dashboard.
-2. Go to `Authentication` -> `Providers`.
-3. Enable `GitHub`.
-4. In GitHub Developer Settings, create a new OAuth App.
-5. Set Authorization callback URL to the Supabase callback URL shown in provider screen.
-6. Copy `Client ID` and `Client Secret` from GitHub into Supabase GitHub provider form.
-7. Save provider config.
-
-### Redirect URLs
-
-Add these URLs in Supabase `Authentication` -> `URL Configuration`:
-
-```text
-http://localhost:5173
-http://localhost:5173/auth/callback
-http://localhost:4000
-http://localhost:4000/auth/callback
-```
-
-For production, add your deployed frontend domain and callback URL too.
-
-Google OAuth callback URL in Supabase provider screen usually has the form:
-
-```text
-https://wkicfgmxyfwgmnplchmg.supabase.co/auth/v1/callback
-```
-
-When creating the Google OAuth client:
-
-```text
-Application type: Web application
-Name: vhub-cms
-Authorized JavaScript origins:
-- http://localhost:5173
-- https://vhub-cms.netlify.app
-
-Authorized redirect URIs:
-- https://wkicfgmxyfwgmnplchmg.supabase.co/auth/v1/callback
-```
-
-For GitHub OAuth app:
-
-```text
-Homepage URL:
-- https://vhub-cms.netlify.app
-
-Authorization callback URL:
-- https://wkicfgmxyfwgmnplchmg.supabase.co/auth/v1/callback
-```
-
-### Admin Access Rule
-
-Only the email configured in `ADMIN_EMAIL` can access the dashboard.
-If Google or GitHub login returns a different email, backend will reject it.
-
-## Netlify Deploy
-
-This repo now includes [netlify.toml](/d:/VHub-CMS-clean/netlify.toml) for frontend deploy.
-
-Netlify UI values:
-
-```text
-Branch to deploy: main
-Base directory: frontend
-Build command: npm ci && npm run build
-Publish directory: frontend/dist
-```
-
-Netlify environment variables:
-
-```text
-VITE_API_BASE_URL=https://your-backend-service.onrender.com
-VITE_SUPABASE_URL=https://wkicfgmxyfwgmnplchmg.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_elv4WKICRFi5ao9EietL_w_zeBueNAI
-```
-
-Important:
-
-```text
-Update the /api redirect in netlify.toml to your real backend Render URL.
-```
-
-## Render Deploy
-
-This repo now includes [render.yaml](/d:/VHub-CMS-clean/render.yaml) for backend deploy with Docker.
-
-Render UI values:
-
-```text
-Language: Docker
-Branch: main
-Root Directory: leave empty
-Dockerfile Path: ./Dockerfile
-```
-
-Render environment variables:
-
-```text
-PORT=4000
-NODE_ENV=production
-SUPABASE_URL=https://wkicfgmxyfwgmnplchmg.supabase.co
-SUPABASE_ANON_KEY=sb_publishable_elv4WKICRFi5ao9EietL_w_zeBueNAI
-ADMIN_EMAIL=your-admin-email@example.com
-ADMIN_PASSWORD=your-admin-password
-FIREBASE_PROJECT_ID=your_firebase_project_id
-FIREBASE_CLIENT_EMAIL=your_firebase_service_account_email
-FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----...
-VITE_API_BASE_URL=https://your-backend-service.onrender.com
-VITE_SUPABASE_URL=https://wkicfgmxyfwgmnplchmg.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_elv4WKICRFi5ao9EietL_w_zeBueNAI
-```
-
-## Production Auth Test
-
-Use the checklist in [production-auth-checklist.md](/d:/VHub-CMS-clean/docs/production-auth-checklist.md).
-
-## GitHub Actions Auto Deploy
-
-This repo now includes:
-
-- [.github/workflows/netlify-deploy.yml](/d:/VHub-CMS-clean/.github/workflows/netlify-deploy.yml)
-- [.github/workflows/render-deploy.yml](/d:/VHub-CMS-clean/.github/workflows/render-deploy.yml)
-
-Required GitHub repository secrets:
-
-```text
-NETLIFY_AUTH_TOKEN
-NETLIFY_SITE_ID
-VITE_API_BASE_URL
-VITE_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY
-RENDER_DEPLOY_HOOK_URL
-```
-
-Render deploy uses a deploy hook URL.
-Netlify deploy builds `frontend` and publishes `frontend/dist`.
+© 2026 Vinh Dev - Powered by VHub Intelligence System.

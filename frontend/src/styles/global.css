@@ -30,8 +30,28 @@
   --shadow-md:       0 4px 16px rgba(15,23,42,0.08);
   --shadow-lg:       0 8px 32px rgba(15,23,42,0.12);
   --shadow-glow:     0 0 0 3px var(--color-primary-glow);
-  --transition:      all 0.22s cubic-bezier(0.4,0,0.2,1);
+  --transition:      all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(255, 122, 26, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 122, 26, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 122, 26, 0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -475,20 +495,21 @@ body {
 .project-card {
   background: var(--color-card-bg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border);
   overflow: hidden;
-  transition: var(--transition);
+  transition: var(--transition-slow);
   height: 100%;
   display: flex;
   flex-direction: column;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
 }
 
 .project-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
-  border-color: rgba(255,122,26,0.2);
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  transform: translateY(-8px) scale(1.01);
+  border-color: var(--color-primary);
 }
+
 
 .project-card-thumb-wrap {
   position: relative;
@@ -574,6 +595,7 @@ body {
   flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -771,8 +793,10 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=60') center/cover;
-  opacity: 0.08;
+  background: url('../assets/images/devCMS.png') center/cover;
+  opacity: 0.05;
+  filter: blur(4px) brightness(0.6);
+  transform: scale(1.05);
 }
 
 .login-left-content {
@@ -1028,11 +1052,52 @@ body {
 
 .ant-table-tbody > tr:hover > td { background: rgba(255,122,26,0.03) !important; }
 
-.ant-card { border-radius: var(--radius-md) !important; box-shadow: var(--shadow-sm) !important; }
-.ant-modal-content { border-radius: var(--radius-lg) !important; }
-.ant-btn-primary { font-weight: 600 !important; }
-.ant-select-selector { border-radius: var(--radius-sm) !important; }
-.ant-input { border-radius: var(--radius-sm) !important; }
+.ant-card { border-radius: var(--radius-lg) !important; box-shadow: var(--shadow-sm) !important; border: 1px solid var(--color-border) !important; }
+.ant-modal-content { border-radius: var(--radius-lg) !important; overflow: hidden !important; }
+.ant-btn-primary { font-weight: 600 !important; border-radius: 8px !important; }
+.ant-select-selector { border-radius: 8px !important; }
+.ant-input { border-radius: 8px !important; }
+
+/* ── Fixed UI for Project Cards ──────────────────────────── */
+.hover-zoom { transition: transform 0.5s ease-in-out; }
+.hover-zoom:hover { transform: scale(1.1); }
+
+.card-status-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.project-detail-btn {
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  background: rgba(255, 122, 26, 0.05) !important;
+  color: #ff7a1a !important;
+  border: 1px solid rgba(255, 122, 26, 0.1) !important;
+}
+
+.project-icon-btn {
+  border-radius: 8px !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.project-icon-btn:hover {
+  background: #f3f4f6 !important;
+  color: #ff7a1a !important;
+  border-color: #ff7a1a !important;
+}
 
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -1043,3 +1108,4 @@ body {
   .top-header { padding: 0 16px; }
   .header-search { width: 180px !important; }
 }
+

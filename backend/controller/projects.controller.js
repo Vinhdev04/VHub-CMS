@@ -7,6 +7,8 @@ import {
   deleteProjectItem,
 } from '../helpers/projects.service.js';
 
+import { fetchGitHubCommits } from '../helpers/github.api.js';
+
 export async function getProjectsController(req, res, next) {
   try {
     const projects = await getProjectList();
@@ -19,6 +21,20 @@ export async function getProjectsController(req, res, next) {
 export async function getProjectDetailController(req, res, next) {
   try {
     const project = await getProjectDetail(req.params.id);
+    
+    // Nếu có GitHub URL, lấy thêm commit stats
+    if (project?.githubUrl && project.githubUrl.includes('github.com')) {
+      try {
+        const parts = project.githubUrl.split('github.com/')[1]?.split('/');
+        if (parts && parts[0] && parts[1]) {
+          const commits = await fetchGitHubCommits(parts[0], parts[1]);
+          project.commits = commits;
+        }
+      } catch (err) {
+        project.commits = [];
+      }
+    }
+    
     return res.json(successResponse(project, 'Lay chi tiet du an thanh cong'));
   } catch (error) {
     return next(error);

@@ -40,7 +40,7 @@ function ProjectFormModal({ open, loading, initialValues, onCancel, onSubmit }) 
       onCancel={onCancel}
       onOk={handleOk}
       confirmLoading={loading}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form layout="vertical" form={form}>
         <Form.Item label="Tên dự án" name="name" rules={[{ required: true }]}>

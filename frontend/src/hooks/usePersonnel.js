@@ -28,6 +28,11 @@ export function usePersonnel() {
     fetchPersonnel();
   }, [fetchPersonnel]);
 
+  useEffect(() => {
+    window.addEventListener('cms:refresh-data', fetchPersonnel);
+    return () => window.removeEventListener('cms:refresh-data', fetchPersonnel);
+  }, [fetchPersonnel]);
+
   async function createPersonnelItem(payload) {
     const created = await apiCreate(payload);
     setPersonnel((prev) => [created, ...prev]);

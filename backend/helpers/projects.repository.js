@@ -31,7 +31,7 @@ export async function findAllProjects() {
   if (!hasFirebaseConfig || !db) return localProjects;
 
   try {
-    const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
+    const snapshot = await db.collection(COLLECTION).get();
     return snapshot.docs.map((doc) => normalizeProject({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.warn(`[FIREBASE] Fallback to local projects list: ${error.message}`);

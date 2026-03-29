@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BellOutlined, PlusOutlined, SearchOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Avatar, Breadcrumb, Button, Dropdown, Input, Space, Typography } from 'antd';
+import { BellOutlined, PlusOutlined, SearchOutlined, UserOutlined, LogoutOutlined, SyncOutlined, GithubOutlined } from '@ant-design/icons';
+import { Avatar, Breadcrumb, Button, Dropdown, Input, Space, Typography, Tooltip } from 'antd';
+import { useState } from 'react';
 import { useAuth } from '../../shared/contexts/auth-context';
 import { SIDEBAR_NAV } from '../../shared/config/menu.config';
 import { ROUTES } from '../../shared/constants/routes';
@@ -9,9 +10,9 @@ const { Text } = Typography;
 
 // Page-specific primary action buttons
 const PAGE_ACTIONS = {
-  [ROUTES.PROJECTS]:  { label: '+ Add New Project', event: 'cms:open-add-project' },
-  [ROUTES.BLOG]:      { label: '+ New Post',         event: 'cms:open-add-post' },
-  [ROUTES.PERSONNEL]: { label: '+ Add Member',       event: 'cms:open-add-member' },
+  [ROUTES.PROJECTS]:  { label: 'Add New', event: 'cms:open-add-project' },
+  [ROUTES.BLOG]:      { label: 'New Post', event: 'cms:open-add-post' },
+  [ROUTES.PERSONNEL]: { label: 'Add Member', event: 'cms:open-add-member' },
 };
 
 // Page-specific search placeholders
@@ -27,6 +28,7 @@ export default function TopHeader() {
   const { pathname } = useLocation();
   const navigate     = useNavigate();
   const { user, logout } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
 
   const activeNav = SIDEBAR_NAV.find((n) => n.path === pathname);
   const pageLabel = activeNav?.label || 'Dashboard';
@@ -45,6 +47,12 @@ export default function TopHeader() {
     },
   };
 
+  function handleRefresh() {
+    setRefreshing(true);
+    window.dispatchEvent(new CustomEvent('cms:refresh-data'));
+    setTimeout(() => setRefreshing(false), 800);
+  }
+
   function handleActionClick() {
     if (pageAction) {
       window.dispatchEvent(new CustomEvent(pageAction.event));
@@ -60,18 +68,37 @@ export default function TopHeader() {
       />
 
       {/* Right side */}
-      <Space size={10} className="header-right">
+      <Space size={12} className="header-right">
         <Input
           prefix={<SearchOutlined style={{ color: '#9ca3af' }} />}
           placeholder={searchPlaceholder}
-          className="header-search"
+          className="header-search glass-panel"
+          style={{ width: 220 }}
           allowClear
         />
+
+        <Tooltip title="Làm mới dữ liệu">
+          <Button 
+            icon={<SyncOutlined spin={refreshing} />} 
+            onClick={handleRefresh}
+            className="header-bell-btn"
+          />
+        </Tooltip>
 
         <div style={{ position: 'relative' }}>
           <Button icon={<BellOutlined />} className="header-bell-btn" />
           <span className="bell-dot" />
         </div>
+
+        {pathname === ROUTES.PROJECTS && (
+          <Tooltip title="Import từ GitHub">
+            <Button 
+              icon={<GithubOutlined />} 
+              onClick={() => window.dispatchEvent(new CustomEvent('cms:github-import'))}
+              className="header-bell-btn"
+            />
+          </Tooltip>
+        )}
 
         {pageAction && (
           <Button
@@ -83,6 +110,7 @@ export default function TopHeader() {
             {pageAction.label}
           </Button>
         )}
+
 
         <Dropdown menu={userMenu} placement="bottomRight" arrow>
           <div className="header-user">

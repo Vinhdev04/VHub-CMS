@@ -8,6 +8,11 @@ export function useProjects() {
 
   useEffect(() => { fetchAll(); }, []);
 
+  useEffect(() => {
+    window.addEventListener('cms:refresh-data', fetchAll);
+    return () => window.removeEventListener('cms:refresh-data', fetchAll);
+  }, []);
+
   async function fetchAll() {
     setLoading(true);
     try {

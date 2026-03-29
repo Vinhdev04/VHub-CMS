@@ -38,7 +38,7 @@ function BlogFormModal({ open, loading, initialValues, onCancel, onSubmit }) {
       confirmLoading={loading}
       onCancel={onCancel}
       onOk={handleOk}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form form={form} layout="vertical">
         <Form.Item label="Tiêu đề" name="title" rules={[{ required: true }]}>

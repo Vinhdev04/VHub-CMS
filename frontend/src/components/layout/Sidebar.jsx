@@ -1,11 +1,33 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { QUICK_STATS_CONFIG, SIDEBAR_NAV } from '../../shared/config/menu.config';
+import { useEffect, useState } from 'react';
+import { SIDEBAR_NAV } from '../../shared/config/menu.config';
+import { useProjects } from '../../hooks/useProjects';
+import { useBlogPosts } from '../../hooks/useBlogPosts';
+import { usePersonnel } from '../../hooks/usePersonnel';
 
 export default function Sidebar() {
   const navigate  = useNavigate();
   const { pathname } = useLocation();
+  const { projects, fetchItems: fetchProj } = useProjects();
+  const { posts, fetchItems: fetchBlog } = useBlogPosts();
+  const { personnel, fetchItems: fetchPers } = usePersonnel();
 
-  // map pathname → active key
+  const counts = {
+      projects: projects.length,
+      blog: posts.length,
+      personnel: personnel.length
+  };
+
+  useEffect(() => {
+    const refresh = () => {
+        fetchProj();
+        fetchBlog();
+        fetchPers();
+    };
+    window.addEventListener('cms:refresh-data', refresh);
+    return () => window.removeEventListener('cms:refresh-data', refresh);
+  }, [fetchProj, fetchBlog, fetchPers]);
+
   const activeKey = SIDEBAR_NAV.find((item) => item.path === pathname)?.key || 'projects';
 
   return (
@@ -26,6 +48,8 @@ export default function Sidebar() {
           {SIDEBAR_NAV.map((item) => {
             const Icon = item.icon;
             const isActive = activeKey === item.key;
+            const badgeValue = counts[item.key];
+
             return (
               <li key={item.key} className="sidebar-menu-item">
                 <button
@@ -34,8 +58,8 @@ export default function Sidebar() {
                 >
                   <span className="sidebar-menu-icon"><Icon /></span>
                   <span>{item.label}</span>
-                  {item.badge != null && (
-                    <span className="sidebar-badge">{item.badge}</span>
+                  {badgeValue !== undefined && (
+                    <span className="sidebar-badge">{badgeValue}</span>
                   )}
                 </button>
               </li>
@@ -46,12 +70,18 @@ export default function Sidebar() {
         {/* Quick Stats */}
         <div className="sidebar-stats">
           <p className="sidebar-section-label">Quick Stats</p>
-          {QUICK_STATS_CONFIG.map((s) => (
-            <div key={s.label} className="sidebar-stat-row">
-              <span>{s.label}</span>
-              <span>{s.value}</span>
-            </div>
-          ))}
+          <div className="sidebar-stat-row">
+            <span>Projects</span>
+            <span>{counts.projects}</span>
+          </div>
+          <div className="sidebar-stat-row">
+            <span>Blog Posts</span>
+            <span>{counts.blog}</span>
+          </div>
+          <div className="sidebar-stat-row">
+            <span>Team</span>
+            <span>{counts.personnel}</span>
+          </div>
         </div>
       </div>
     </aside>

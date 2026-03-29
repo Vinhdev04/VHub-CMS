@@ -31,7 +31,7 @@ export async function findAllBlogPosts() {
   if (!hasFirebaseConfig || !db) return localBlogPosts;
 
   try {
-    const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
+    const snapshot = await db.collection(COLLECTION).get();
     return snapshot.docs.map((doc) => normalizePost({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.warn(`[FIREBASE] Fallback to local blog list: ${error.message}`);

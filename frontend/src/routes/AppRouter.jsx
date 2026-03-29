@@ -1,5 +1,6 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Spin } from 'antd';
+import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../shared/contexts/auth-context';
 import AdminLayout      from '../components/layout/AdminLayout';
 import LoginPage        from '../pages/LoginPage';
@@ -9,6 +10,7 @@ import BlogPage         from '../modules/blog/pages/BlogPage';
 import AnalyticsPage    from '../pages/AnalyticsPage';
 import AccountPage      from '../pages/AccountPage';
 import PersonnelPage    from '../pages/PersonnelPage';
+import MotionWrapper    from '../components/shared/MotionWrapper';
 import { ROUTES }       from '../shared/constants/routes';
 
 // Guard: redirect to login if not authenticated
@@ -30,31 +32,35 @@ function ProtectedRoute({ children }) {
 }
 
 export default function AppRouter() {
+  const location = useLocation();
+
   return (
-    <Routes>
-      {/* Public */}
-      <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-      <Route path="/auth/callback" element={<AuthCallbackPage />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public */}
+        <Route path={ROUTES.LOGIN} element={<MotionWrapper><LoginPage /></MotionWrapper>} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
-      {/* Protected — all inside AdminLayout */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to={ROUTES.PROJECTS} replace />} />
-        <Route path={ROUTES.PROJECTS}  element={<ProjectsPage />} />
-        <Route path={ROUTES.BLOG}      element={<BlogPage />} />
-        <Route path={ROUTES.ANALYTICS} element={<AnalyticsPage />} />
-        <Route path={ROUTES.ACCOUNT}   element={<AccountPage />} />
-        <Route path={ROUTES.PERSONNEL} element={<PersonnelPage />} />
-      </Route>
+        {/* Protected — all inside AdminLayout */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to={ROUTES.PROJECTS} replace />} />
+          <Route path={ROUTES.PROJECTS}  element={<MotionWrapper><ProjectsPage /></MotionWrapper>} />
+          <Route path={ROUTES.BLOG}      element={<MotionWrapper><BlogPage /></MotionWrapper>} />
+          <Route path={ROUTES.ANALYTICS} element={<MotionWrapper><AnalyticsPage /></MotionWrapper>} />
+          <Route path={ROUTES.ACCOUNT}   element={<MotionWrapper><AccountPage /></MotionWrapper>} />
+          <Route path={ROUTES.PERSONNEL} element={<MotionWrapper><PersonnelPage /></MotionWrapper>} />
+        </Route>
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
-    </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
+      </Routes>
+    </AnimatePresence>
   );
 }
