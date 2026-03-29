@@ -30,8 +30,8 @@ export async function adminLoginController(req, res, next) {
       return res.status(400).json({ ok: false, message: 'Mat khau phai co it nhat 8 ky tu.' });
     }
 
-    // 1. Kiểm tra cấu hình trong .env (Root Admin)
-    const isRootAdmin = (isAdminEmail(email) || ['pcv.fed@gmail.com', 'vaniizit@gmail.com'].includes(email)) && password === env.adminPassword;
+    const sysPass = String(env.adminPassword || '').trim();
+    const isRootAdmin = (isAdminEmail(email) || ['pcv.fed@gmail.com', 'vaniizit@gmail.com'].includes(email)) && password === sysPass;
     console.log(`[AUTH] Checking login: ${email}, RootAdmin? ${isRootAdmin}`);
     
     // 2. Kiểm tra trong Database (Personnel collection)
@@ -49,7 +49,7 @@ export async function adminLoginController(req, res, next) {
             // Logic kiểm tra mật khẩu linh hoạt:
             if (foundUser.role === 'Viewer' && password === 'demo123456') {
                 dbUser = foundUser;
-            } else if (password === env.adminPassword || (foundUser.password && password === foundUser.password)) {
+            } else if (password === sysPass || (foundUser.password && password === foundUser.password)) {
                 dbUser = foundUser;
             }
         }

@@ -45,9 +45,11 @@ async function request(path, options = {}) {
     headers['X-Dev-User-Role'] = storedUser.role || 'Administrator';
   }
 
+  const requestHeaders = { ...headers, ...(options.headers || {}) };
+
   const response = await fetch(`${BASE_URL}/api${path}`, {
-    headers,
     ...options,
+    headers: requestHeaders,
   });
 
   if (!response.ok) {
