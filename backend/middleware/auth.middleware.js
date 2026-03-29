@@ -1,4 +1,4 @@
-import { env, hasSupabaseConfig, isAdminEmail } from '../config/env.js';
+import { env, hasSupabaseConfig, isAdminEmail, hasFirebaseConfig } from '../config/env.js';
 import { supabase } from '../lib/supabase.js';
 
 function extractSupabaseEmail(user) {
