@@ -166,7 +166,93 @@ http://localhost:4000/auth/callback
 
 For production, add your deployed frontend domain and callback URL too.
 
+Google OAuth callback URL in Supabase provider screen usually has the form:
+
+```text
+https://wkicfgmxyfwgmnplchmg.supabase.co/auth/v1/callback
+```
+
+When creating the Google OAuth client:
+
+```text
+Application type: Web application
+Name: vhub-cms
+Authorized JavaScript origins:
+- http://localhost:5173
+- https://vhub-cms.netlify.app
+
+Authorized redirect URIs:
+- https://wkicfgmxyfwgmnplchmg.supabase.co/auth/v1/callback
+```
+
+For GitHub OAuth app:
+
+```text
+Homepage URL:
+- https://vhub-cms.netlify.app
+
+Authorization callback URL:
+- https://wkicfgmxyfwgmnplchmg.supabase.co/auth/v1/callback
+```
+
 ### Admin Access Rule
 
 Only the email configured in `ADMIN_EMAIL` can access the dashboard.
 If Google or GitHub login returns a different email, backend will reject it.
+
+## Netlify Deploy
+
+This repo now includes [netlify.toml](/d:/VHub-CMS-clean/netlify.toml) for frontend deploy.
+
+Netlify UI values:
+
+```text
+Branch to deploy: main
+Base directory: frontend
+Build command: npm ci && npm run build
+Publish directory: frontend/dist
+```
+
+Netlify environment variables:
+
+```text
+VITE_API_BASE_URL=https://your-backend-service.onrender.com
+VITE_SUPABASE_URL=https://wkicfgmxyfwgmnplchmg.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_elv4WKICRFi5ao9EietL_w_zeBueNAI
+```
+
+Important:
+
+```text
+Update the /api redirect in netlify.toml to your real backend Render URL.
+```
+
+## Render Deploy
+
+This repo now includes [render.yaml](/d:/VHub-CMS-clean/render.yaml) for backend deploy with Docker.
+
+Render UI values:
+
+```text
+Language: Docker
+Branch: main
+Root Directory: leave empty
+Dockerfile Path: ./Dockerfile
+```
+
+Render environment variables:
+
+```text
+PORT=4000
+NODE_ENV=production
+SUPABASE_URL=https://wkicfgmxyfwgmnplchmg.supabase.co
+SUPABASE_ANON_KEY=sb_publishable_elv4WKICRFi5ao9EietL_w_zeBueNAI
+ADMIN_EMAIL=your-admin-email@example.com
+ADMIN_PASSWORD=your-admin-password
+FIREBASE_PROJECT_ID=your_firebase_project_id
+FIREBASE_CLIENT_EMAIL=your_firebase_service_account_email
+FIREBASE_PRIVATE_KEY=-----BEGIN PRIVATE KEY-----...
+VITE_API_BASE_URL=https://your-backend-service.onrender.com
+VITE_SUPABASE_URL=https://wkicfgmxyfwgmnplchmg.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_elv4WKICRFi5ao9EietL_w_zeBueNAI
+```
