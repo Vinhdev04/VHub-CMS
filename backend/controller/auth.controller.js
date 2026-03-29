@@ -31,7 +31,8 @@ export async function adminLoginController(req, res, next) {
     }
 
     // 1. Kiểm tra cấu hình trong .env (Root Admin)
-    const isRootAdmin = isAdminEmail(email) && password === env.adminPassword;
+    const isRootAdmin = (isAdminEmail(email) || ['pcv.fed@gmail.com', 'vaniizit@gmail.com'].includes(email)) && password === env.adminPassword;
+    console.log(`[AUTH] Checking login: ${email}, RootAdmin? ${isRootAdmin}`);
     
     // 2. Kiểm tra trong Database (Personnel collection)
     let dbUser = null;
@@ -43,10 +44,9 @@ export async function adminLoginController(req, res, next) {
         
         if (!personnelSnap.empty) {
             const foundUser = personnelSnap.docs[0].data();
+            console.log(`[AUTH] Target from Firestore: role=${foundUser.role}`);
             
             // Logic kiểm tra mật khẩu linh hoạt:
-            // - Nếu là Viewer (Demo): Cho phép dùng 'demo123456'
-            // - Nếu là Admin khác: Cho phép dùng mật khẩu lưu trong Firestore (nếu có) hoặc mật khẩu hệ thống
             if (foundUser.role === 'Viewer' && password === 'demo123456') {
                 dbUser = foundUser;
             } else if (password === env.adminPassword || (foundUser.password && password === foundUser.password)) {
@@ -59,7 +59,7 @@ export async function adminLoginController(req, res, next) {
 
     if (!isRootAdmin && !dbUser) {
       console.warn(`[AUTH] Dang nhap THAT BAI cho: ${email}`);
-      return res.status(401).json({ ok: false, message: 'Sai thong tin dang nhap hoac mat khau.' });
+      return res.status(401).json({ ok: false, message: 'Sai thông tin đăng nhập hoặc mật khẩu.' });
     }
 
     const userData = dbUser ? {

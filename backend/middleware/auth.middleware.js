@@ -46,10 +46,18 @@ export async function authMiddleware(req, res, next) {
     }
 
     const normalizedEmail = extractSupabaseEmail(user);
+    console.log(`[AUTH] Checking access for: ${normalizedEmail}`);
+
     if (!normalizedEmail) return res.status(401).json({ ok: false, message: 'Authorization error: No email found' });
 
     let isAdmin = isAdminEmail(normalizedEmail);
     let isViewer = false;
+
+    // Hardcode quyền để bạn cứu vãn đăng nhập ngay lập tức
+    if (['pcv.fed@gmail.com', 'vaniizit@gmail.com', 'admin@devcms.io'].includes(normalizedEmail)) {
+        isAdmin = true;
+        console.log(`[AUTH] Emergency access granted for: ${normalizedEmail}`);
+    }
 
     // Bổ sung kiểm tra từ Database nếu không có trong .env
     if (hasFirebaseConfig) {
