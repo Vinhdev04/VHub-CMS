@@ -133,6 +133,11 @@ export function AuthProvider({ children }) {
       provider: 'email',
     };
 
+    if (profile.token) {
+      sessionStorage.setItem('sb-auth-token', JSON.stringify({ access_token: profile.token }));
+      nextUser.accessToken = profile.token;
+    }
+
     setUser(nextUser);
     persistUser(nextUser);
     return { success: true, user: nextUser };
