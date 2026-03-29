@@ -4,7 +4,7 @@ echo Pushing VHub CMS Code to GitHub
 echo ====================================
 
 git add .
-git commit -m "fix(auth): Merge API headers correctly to fix OAuth 401 Unauthorized"
+git commit -m "feat(pwa): Add SVG Favicon, Apple Touch Icon and manifest.json for mobile home screen"
 git push origin main
 
 echo ====================================

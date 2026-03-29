@@ -32,12 +32,23 @@ export async function adminLoginController(req, res, next) {
 
     const sysPass = String(env.adminPassword || '').trim();
     const isRootAdmin = (isAdminEmail(email) || ['pcv.fed@gmail.com', 'vaniizit@gmail.com'].includes(email)) && password === sysPass;
-    console.log(`[AUTH] Checking login: ${email}, RootAdmin? ${isRootAdmin}`);
+    const isDemoDirect = email === 'demo@vhub.io' && password === 'demo123456';
+    console.log(`[AUTH] Checking login: ${email}, RootAdmin? ${isRootAdmin}, Demo? ${isDemoDirect}`);
     
     // 2. Kiểm tra trong Database (Personnel collection)
     let dbUser = null;
-    try {
-        const { db } = await import('../lib/firebase.js');
+    if (isDemoDirect) {
+        dbUser = {
+            id: `demo:demo@vhub.io`,
+            email: 'demo@vhub.io',
+            name: 'Demo Viewer',
+            role: 'Viewer',
+            avatar: '',
+            provider: 'demo'
+        };
+    } else {
+        try {
+            const { db } = await import('../lib/firebase.js');
         const personnelSnap = await db.collection('personnel')
             .where('email', '==', email)
             .get();
@@ -53,8 +64,9 @@ export async function adminLoginController(req, res, next) {
                 dbUser = foundUser;
             }
         }
-    } catch (err) {
-        console.error('[AUTH] Lỗi truy vấn database login:', err.message);
+        } catch (err) {
+            console.error('[AUTH] Lỗi truy vấn database login:', err.message);
+        }
     }
 
     if (!isRootAdmin && !dbUser) {
@@ -72,6 +84,9 @@ export async function adminLoginController(req, res, next) {
     } : normalizeAdminUser(email);
 
     const profile = await getUserProfile(userData);
+    if (isDemoDirect) {
+        profile.token = 'demo-token-123456';
+    }
     return res.json(successResponse(profile, 'Dang nhap thanh cong'));
   } catch (error) {
     return next(error);

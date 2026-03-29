@@ -1100,12 +1100,123 @@ body {
 }
 
 /* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  /* Tablet tweaks */
+  .stat-card-value { font-size: 24px; }
+  .login-left { padding: 32px; }
+  .login-headline { font-size: 36px !important; }
+  .login-right { width: 400px; padding: 40px 32px; }
+}
+
 @media (max-width: 768px) {
-  .app-sidebar { display: none !important; }
+  /* Sidebar becomes Bottom Navigation on Mobile */
+  .app-sidebar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 70px;
+    z-index: 1000;
+    border-right: none !important;
+    border-top: 1px solid var(--color-sidebar-border) !important;
+    display: flex !important;
+  }
+  .app-sidebar::before { display: none; }
+  .sidebar-inner { 
+    padding: 0; 
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: space-around; 
+    height: 100%; 
+    overflow: hidden; 
+  }
+  .sidebar-brand, .sidebar-section-label, .sidebar-stats { display: none; }
+  .sidebar-menu-custom {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
+    margin: 0; padding: 0 4px;
+  }
+  .sidebar-menu-item { margin: 0; flex: 1; display: flex; justify-content: center; }
+  .sidebar-menu-link {
+    flex-direction: column;
+    padding: 10px 0;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    border-radius: 12px;
+    width: 100%;
+    margin: 4px;
+  }
+  .sidebar-menu-link span:not(.sidebar-menu-icon) { font-size: 10.5px; line-height: 1; font-weight: 600; }
+  .sidebar-menu-link.active { background: transparent; }
+  .sidebar-menu-link.active::before {
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 24px; height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--color-primary);
+  }
+  .sidebar-badge { display: none; }
+
+  /* App Content spacing for bottom nav */
+  .app-content-wrapper { padding-bottom: 70px; }
   .app-content { padding: 16px; }
-  .login-left { display: none; }
-  .login-right { width: 100%; }
-  .top-header { padding: 0 16px; }
-  .header-search { width: 180px !important; }
+  
+  /* Top Header */
+  .top-header { padding: 0 16px; height: 60px; }
+  .header-search { display: none !important; }
+  .header-user-name, .header-user-role { display: none; }
+  .header-add-btn span { display: none; }
+  .header-add-btn { width: 34px !important; height: 34px !important; padding: 0 !important; }
+  .header-bell-btn { width: 34px !important; height: 34px !important; }
+  
+  /* Login Page */
+  .login-root { flex-direction: column; }
+  .login-left { height: 260px; padding: 24px; justify-content: center; align-items: flex-start; }
+  .login-right { 
+    width: 100%; 
+    flex: 1;
+    padding: 32px 24px; 
+    border-radius: 24px 24px 0 0; 
+    margin-top: -24px; 
+    z-index: 10; 
+    border-left: none;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .login-headline { font-size: 32px !important; margin-bottom: 8px !important; }
+  .login-desc { margin-bottom: 24px; font-size: 13px; }
+  .login-feature-grid { display: none; }
+
+  /* Utilities */
+  .page-title { font-size: 20px !important; }
+  .filter-bar { flex-direction: column; align-items: stretch; gap: 12px; }
+  .filter-sort-select { width: 100% !important; }
+  .filter-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 8px; justify-content: flex-start; }
+  .filter-tab-btn { flex-shrink: 0; }
+  
+  /* Cards */
+  .project-card-thumb-wrap { aspect-ratio: 16/9; }
+  .stat-card { padding: 16px; }
+  .stat-card-value { font-size: 24px; }
+  .stat-card-icon { width: 36px; height: 36px; font-size: 16px; }
+}
+
+@media (max-width: 480px) {
+  /* Extra mobile tweaks */
+  .header-breadcrumb { display: none; }
+  .top-header { justify-content: space-between; }
+  .header-left {
+      width: 100%;
+      position: relative;
+  }
+  .header-left::before {
+      content: 'DevCMS';
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--color-primary);
+  }
+  .login-right { padding: 24px 20px; }
 }
 

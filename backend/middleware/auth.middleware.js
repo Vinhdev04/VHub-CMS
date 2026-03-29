@@ -35,6 +35,21 @@ export async function authMiddleware(req, res, next) {
 
   const token = authHeader.split(' ')[1];
 
+  if (token === 'demo-token-123456') {
+    req.user = {
+      id: 'demo:demo@vhub.io',
+      email: 'demo@vhub.io',
+      name: 'Demo Viewer',
+      avatar: '',
+      provider: 'demo',
+      role: 'Viewer'
+    };
+    if (req.method !== 'GET') {
+      return res.status(403).json({ ok: false, message: 'Tai khoan Demo chi co quyen xem, khong the thay doi du lieu.' });
+    }
+    return next();
+  }
+
   try {
     const {
       data: { user },

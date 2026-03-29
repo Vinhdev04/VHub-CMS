@@ -1,0 +1,16 @@
+{
+  "name": "DevCMS Admin Workspace",
+  "short_name": "DevCMS",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#FF7A00",
+  "description": "Developer Portfolio & Blog CMS",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
