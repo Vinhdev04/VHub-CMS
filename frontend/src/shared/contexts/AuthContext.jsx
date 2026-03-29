@@ -1,8 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { adminLogin, getMyProfile } from '../../api/auth.api';
 import { hasSupabase, supabase } from '../../config/supabase';
-
-const AuthContext = createContext(null);
+import { AuthContext } from './auth-context';
 
 function persistUser(userData) {
   sessionStorage.setItem('cms_user', JSON.stringify(userData));
@@ -12,14 +11,29 @@ function clearUser() {
   sessionStorage.removeItem('cms_user');
 }
 
+function extractSupabaseEmail(supabaseUser) {
+  const candidates = [
+    supabaseUser?.email,
+    supabaseUser?.user_metadata?.email,
+    supabaseUser?.user_metadata?.preferred_email,
+    ...(Array.isArray(supabaseUser?.identities)
+      ? supabaseUser.identities.map((identity) => identity?.identity_data?.email)
+      : []),
+  ];
+
+  const matched = candidates.find((value) => typeof value === 'string' && value.trim());
+  return matched || '';
+}
+
 function mapSupabaseUser(supabaseUser, accessToken) {
+  const email = extractSupabaseEmail(supabaseUser);
   return {
     id: supabaseUser.id,
-    email: supabaseUser.email,
+    email,
     name:
       supabaseUser.user_metadata?.full_name ||
       supabaseUser.user_metadata?.name ||
-      supabaseUser.email?.split('@')[0] ||
+      email?.split('@')[0] ||
       'User',
     avatar: supabaseUser.user_metadata?.avatar_url || '',
     provider: supabaseUser.app_metadata?.provider || 'email',
@@ -186,8 +200,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }

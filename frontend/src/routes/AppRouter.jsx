@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Spin } from 'antd';
-import { useAuth } from '../shared/contexts/AuthContext';
+import { useAuth } from '../shared/contexts/auth-context';
 import AdminLayout      from '../components/layout/AdminLayout';
 import LoginPage        from '../pages/LoginPage';
 import AuthCallbackPage from '../pages/AuthCallbackPage';

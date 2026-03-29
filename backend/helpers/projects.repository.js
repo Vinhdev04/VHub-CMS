@@ -30,8 +30,13 @@ function normalizeProject(project) {
 export async function findAllProjects() {
   if (!hasFirebaseConfig || !db) return localProjects;
 
-  const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
-  return snapshot.docs.map((doc) => normalizeProject({ id: doc.id, ...doc.data() }));
+  try {
+    const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
+    return snapshot.docs.map((doc) => normalizeProject({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local projects list: ${error.message}`);
+    return localProjects;
+  }
 }
 
 export async function findProjectById(projectId) {
@@ -41,9 +46,16 @@ export async function findProjectById(projectId) {
     return project;
   }
 
-  const doc = await db.collection(COLLECTION).doc(projectId).get();
-  if (!doc.exists) throw new Error('Khong tim thay du an.');
-  return normalizeProject({ id: doc.id, ...doc.data() });
+  try {
+    const doc = await db.collection(COLLECTION).doc(projectId).get();
+    if (!doc.exists) throw new Error('Khong tim thay du an.');
+    return normalizeProject({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local project detail ${projectId}: ${error.message}`);
+    const project = localProjects.find((item) => String(item.id) === String(projectId));
+    if (!project) throw error;
+    return project;
+  }
 }
 
 export async function createProject(payload) {
@@ -56,22 +68,30 @@ export async function createProject(payload) {
     return newProject;
   }
 
-  const createdAt = new Date().toISOString();
-  const docRef = await db.collection(COLLECTION).add({
-    name: projectData.name,
-    description: projectData.description,
-    status: projectData.status,
-    stars: projectData.stars,
-    technologies: projectData.technologies,
-    thumbnail: projectData.thumbnail,
-    live_demo_url: projectData.liveDemoUrl,
-    github_url: projectData.githubUrl,
-    category: projectData.category,
-    created_at: createdAt,
-    updated_at: createdAt,
-  });
+  try {
+    const createdAt = new Date().toISOString();
+    const docRef = await db.collection(COLLECTION).add({
+      name: projectData.name,
+      description: projectData.description,
+      status: projectData.status,
+      stars: projectData.stars,
+      technologies: projectData.technologies,
+      thumbnail: projectData.thumbnail,
+      live_demo_url: projectData.liveDemoUrl,
+      github_url: projectData.githubUrl,
+      category: projectData.category,
+      created_at: createdAt,
+      updated_at: createdAt,
+    });
 
-  return normalizeProject({ id: docRef.id, ...projectData, created_at: createdAt, updated_at: createdAt });
+    return normalizeProject({ id: docRef.id, ...projectData, created_at: createdAt, updated_at: createdAt });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local project create: ${error.message}`);
+    const timestamp = new Date().toISOString();
+    const newProject = { ...projectData, id: `p_${Date.now()}`, createdAt: timestamp, updatedAt: timestamp };
+    localProjects = [newProject, ...localProjects];
+    return newProject;
+  }
 }
 
 export async function updateProject(projectId, payload) {
@@ -85,22 +105,31 @@ export async function updateProject(projectId, payload) {
     return localProjects[idx];
   }
 
-  const docRef = db.collection(COLLECTION).doc(projectId);
-  await docRef.update({
-    name: projectData.name,
-    description: projectData.description,
-    status: projectData.status,
-    stars: projectData.stars,
-    technologies: projectData.technologies,
-    thumbnail: projectData.thumbnail,
-    live_demo_url: projectData.liveDemoUrl,
-    github_url: projectData.githubUrl,
-    category: projectData.category,
-    updated_at: new Date().toISOString(),
-  });
+  try {
+    const docRef = db.collection(COLLECTION).doc(projectId);
+    await docRef.update({
+      name: projectData.name,
+      description: projectData.description,
+      status: projectData.status,
+      stars: projectData.stars,
+      technologies: projectData.technologies,
+      thumbnail: projectData.thumbnail,
+      live_demo_url: projectData.liveDemoUrl,
+      github_url: projectData.githubUrl,
+      category: projectData.category,
+      updated_at: new Date().toISOString(),
+    });
 
-  const updated = await docRef.get();
-  return normalizeProject({ id: updated.id, ...updated.data() });
+    const updated = await docRef.get();
+    return normalizeProject({ id: updated.id, ...updated.data() });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local project update ${projectId}: ${error.message}`);
+    const idx = localProjects.findIndex((p) => String(p.id) === String(projectId));
+    if (idx < 0) throw error;
+    const updatedAt = new Date().toISOString();
+    localProjects[idx] = { ...localProjects[idx], ...projectData, id: localProjects[idx].id, updatedAt };
+    return localProjects[idx];
+  }
 }
 
 export async function deleteProject(projectId) {
@@ -111,6 +140,14 @@ export async function deleteProject(projectId) {
     return { id: projectId };
   }
 
-  await db.collection(COLLECTION).doc(projectId).delete();
-  return { id: projectId };
+  try {
+    await db.collection(COLLECTION).doc(projectId).delete();
+    return { id: projectId };
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local project delete ${projectId}: ${error.message}`);
+    const prev = localProjects.length;
+    localProjects = localProjects.filter((p) => String(p.id) !== String(projectId));
+    if (localProjects.length === prev) throw error;
+    return { id: projectId };
+  }
 }

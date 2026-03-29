@@ -44,8 +44,13 @@ function normalize(person) {
 export async function findAllPersonnel() {
   if (!hasFirebaseConfig || !db) return localPersonnel;
 
-  const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
-  return snapshot.docs.map((doc) => normalize({ id: doc.id, ...doc.data() }));
+  try {
+    const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
+    return snapshot.docs.map((doc) => normalize({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local personnel list: ${error.message}`);
+    return localPersonnel;
+  }
 }
 
 export async function createPersonnel(payload) {
@@ -57,19 +62,26 @@ export async function createPersonnel(payload) {
     return newPerson;
   }
 
-  const docRef = await db.collection(COLLECTION).add({
-    name: data.name,
-    role: data.role,
-    email: data.email,
-    status: data.status,
-    projects: data.projects,
-    joined_at: data.joinedAt,
-    role_color: data.roleColor,
-    avatar: data.avatar,
-    created_at: new Date().toISOString(),
-  });
+  try {
+    const docRef = await db.collection(COLLECTION).add({
+      name: data.name,
+      role: data.role,
+      email: data.email,
+      status: data.status,
+      projects: data.projects,
+      joined_at: data.joinedAt,
+      role_color: data.roleColor,
+      avatar: data.avatar,
+      created_at: new Date().toISOString(),
+    });
 
-  return normalize({ id: docRef.id, ...data });
+    return normalize({ id: docRef.id, ...data });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local personnel create: ${error.message}`);
+    const newPerson = { ...data, id: `u_${Date.now()}` };
+    localPersonnel = [newPerson, ...localPersonnel];
+    return newPerson;
+  }
 }
 
 export async function updatePersonnel(personId, payload) {
@@ -82,21 +94,29 @@ export async function updatePersonnel(personId, payload) {
     return localPersonnel[idx];
   }
 
-  const docRef = db.collection(COLLECTION).doc(personId);
-  await docRef.update({
-    name: data.name,
-    role: data.role,
-    email: data.email,
-    status: data.status,
-    projects: data.projects,
-    joined_at: data.joinedAt,
-    role_color: data.roleColor,
-    avatar: data.avatar,
-    updated_at: new Date().toISOString(),
-  });
+  try {
+    const docRef = db.collection(COLLECTION).doc(personId);
+    await docRef.update({
+      name: data.name,
+      role: data.role,
+      email: data.email,
+      status: data.status,
+      projects: data.projects,
+      joined_at: data.joinedAt,
+      role_color: data.roleColor,
+      avatar: data.avatar,
+      updated_at: new Date().toISOString(),
+    });
 
-  const updated = await docRef.get();
-  return normalize({ id: updated.id, ...updated.data() });
+    const updated = await docRef.get();
+    return normalize({ id: updated.id, ...updated.data() });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local personnel update ${personId}: ${error.message}`);
+    const idx = localPersonnel.findIndex((p) => String(p.id) === String(personId));
+    if (idx < 0) throw error;
+    localPersonnel[idx] = { ...localPersonnel[idx], ...data, id: localPersonnel[idx].id };
+    return localPersonnel[idx];
+  }
 }
 
 export async function deletePersonnel(personId) {
@@ -107,6 +127,14 @@ export async function deletePersonnel(personId) {
     return { id: personId };
   }
 
-  await db.collection(COLLECTION).doc(personId).delete();
-  return { id: personId };
+  try {
+    await db.collection(COLLECTION).doc(personId).delete();
+    return { id: personId };
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local personnel delete ${personId}: ${error.message}`);
+    const prev = localPersonnel.length;
+    localPersonnel = localPersonnel.filter((p) => String(p.id) !== String(personId));
+    if (localPersonnel.length === prev) throw error;
+    return { id: personId };
+  }
 }

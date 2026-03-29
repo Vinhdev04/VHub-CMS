@@ -4,7 +4,7 @@ import {
   UserOutlined, GithubOutlined, TwitterOutlined, SaveOutlined, CameraOutlined,
 } from '@ant-design/icons';
 import { getMyProfile, updateMyProfile } from '../api/auth.api';
-import { useAuth } from '../shared/contexts/AuthContext';
+import { useAuth } from '../shared/contexts/auth-context';
 
 const { Title, Text } = Typography;
 

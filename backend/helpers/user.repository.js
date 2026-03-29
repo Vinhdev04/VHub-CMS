@@ -24,16 +24,22 @@ function normalizeUserProfile(input = {}) {
 
 export async function getUserProfile(authUser) {
   const fallback = normalizeUserProfile(authUser);
+  const docId = authUser.id || authUser.email;
 
   if (!hasFirebaseConfig || !db) {
-    const existing = localUsers.get(authUser.id || authUser.email);
+    const existing = localUsers.get(docId);
     return existing ? { ...fallback, ...existing } : fallback;
   }
 
-  const docId = authUser.id || authUser.email;
-  const doc = await db.collection(COLLECTION).doc(docId).get();
-  if (!doc.exists) return fallback;
-  return { ...fallback, ...normalizeUserProfile({ id: doc.id, ...doc.data() }) };
+  try {
+    const doc = await db.collection(COLLECTION).doc(docId).get();
+    if (!doc.exists) return fallback;
+    return { ...fallback, ...normalizeUserProfile({ id: doc.id, ...doc.data() }) };
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local user profile for ${docId}: ${error.message}`);
+    const existing = localUsers.get(docId);
+    return existing ? { ...fallback, ...existing } : fallback;
+  }
 }
 
 export async function upsertUserProfile(authUser, payload) {
@@ -55,21 +61,26 @@ export async function upsertUserProfile(authUser, payload) {
     return nextProfile;
   }
 
-  await db.collection(COLLECTION).doc(docId).set({
-    email: nextProfile.email,
-    name: nextProfile.name,
-    role: nextProfile.role,
-    avatar: nextProfile.avatar,
-    username: nextProfile.username,
-    bio: nextProfile.bio,
-    location: nextProfile.location,
-    website: nextProfile.website,
-    github: nextProfile.github,
-    twitter: nextProfile.twitter,
-    provider: nextProfile.provider,
-    created_at: nextProfile.createdAt || timestamp,
-    updated_at: timestamp,
-  }, { merge: true });
+  try {
+    await db.collection(COLLECTION).doc(docId).set({
+      email: nextProfile.email,
+      name: nextProfile.name,
+      role: nextProfile.role,
+      avatar: nextProfile.avatar,
+      username: nextProfile.username,
+      bio: nextProfile.bio,
+      location: nextProfile.location,
+      website: nextProfile.website,
+      github: nextProfile.github,
+      twitter: nextProfile.twitter,
+      provider: nextProfile.provider,
+      created_at: nextProfile.createdAt || timestamp,
+      updated_at: timestamp,
+    }, { merge: true });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local user profile write for ${docId}: ${error.message}`);
+    localUsers.set(docId, nextProfile);
+  }
 
   return nextProfile;
 }

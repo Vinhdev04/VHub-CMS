@@ -30,8 +30,13 @@ function normalizePost(post) {
 export async function findAllBlogPosts() {
   if (!hasFirebaseConfig || !db) return localBlogPosts;
 
-  const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
-  return snapshot.docs.map((doc) => normalizePost({ id: doc.id, ...doc.data() }));
+  try {
+    const snapshot = await db.collection(COLLECTION).orderBy('created_at', 'desc').get();
+    return snapshot.docs.map((doc) => normalizePost({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local blog list: ${error.message}`);
+    return localBlogPosts;
+  }
 }
 
 export async function findBlogPostById(postId) {
@@ -41,9 +46,16 @@ export async function findBlogPostById(postId) {
     return post;
   }
 
-  const doc = await db.collection(COLLECTION).doc(postId).get();
-  if (!doc.exists) throw new Error('Khong tim thay bai viet.');
-  return normalizePost({ id: doc.id, ...doc.data() });
+  try {
+    const doc = await db.collection(COLLECTION).doc(postId).get();
+    if (!doc.exists) throw new Error('Khong tim thay bai viet.');
+    return normalizePost({ id: doc.id, ...doc.data() });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local blog detail ${postId}: ${error.message}`);
+    const post = localBlogPosts.find((item) => String(item.id) === String(postId));
+    if (!post) throw error;
+    return post;
+  }
 }
 
 export async function createBlogPost(payload) {
@@ -62,29 +74,43 @@ export async function createBlogPost(payload) {
     return newPost;
   }
 
-  const createdAt = new Date().toISOString();
-  const publishedAt = postData.publishedAt || createdAt;
-  const docRef = await db.collection(COLLECTION).add({
-    title: postData.title,
-    excerpt: postData.excerpt,
-    content: postData.content,
-    tags: postData.tags,
-    views: postData.views,
-    likes: postData.likes,
-    status: postData.status,
-    read_time: postData.readTime,
-    published_at: publishedAt,
-    created_at: createdAt,
-    updated_at: createdAt,
-  });
+  try {
+    const createdAt = new Date().toISOString();
+    const publishedAt = postData.publishedAt || createdAt;
+    const docRef = await db.collection(COLLECTION).add({
+      title: postData.title,
+      excerpt: postData.excerpt,
+      content: postData.content,
+      tags: postData.tags,
+      views: postData.views,
+      likes: postData.likes,
+      status: postData.status,
+      read_time: postData.readTime,
+      published_at: publishedAt,
+      created_at: createdAt,
+      updated_at: createdAt,
+    });
 
-  return normalizePost({
-    id: docRef.id,
-    ...postData,
-    published_at: publishedAt,
-    created_at: createdAt,
-    updated_at: createdAt,
-  });
+    return normalizePost({
+      id: docRef.id,
+      ...postData,
+      published_at: publishedAt,
+      created_at: createdAt,
+      updated_at: createdAt,
+    });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local blog create: ${error.message}`);
+    const timestamp = new Date().toISOString();
+    const newPost = {
+      ...postData,
+      id: `b_${Date.now()}`,
+      publishedAt: postData.publishedAt || timestamp,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    };
+    localBlogPosts = [newPost, ...localBlogPosts];
+    return newPost;
+  }
 }
 
 export async function updateBlogPost(postId, payload) {
@@ -98,22 +124,31 @@ export async function updateBlogPost(postId, payload) {
     return localBlogPosts[idx];
   }
 
-  const docRef = db.collection(COLLECTION).doc(postId);
-  await docRef.update({
-    title: postData.title,
-    excerpt: postData.excerpt,
-    content: postData.content,
-    tags: postData.tags,
-    views: postData.views,
-    likes: postData.likes,
-    status: postData.status,
-    read_time: postData.readTime,
-    published_at: postData.publishedAt || '',
-    updated_at: new Date().toISOString(),
-  });
+  try {
+    const docRef = db.collection(COLLECTION).doc(postId);
+    await docRef.update({
+      title: postData.title,
+      excerpt: postData.excerpt,
+      content: postData.content,
+      tags: postData.tags,
+      views: postData.views,
+      likes: postData.likes,
+      status: postData.status,
+      read_time: postData.readTime,
+      published_at: postData.publishedAt || '',
+      updated_at: new Date().toISOString(),
+    });
 
-  const updated = await docRef.get();
-  return normalizePost({ id: updated.id, ...updated.data() });
+    const updated = await docRef.get();
+    return normalizePost({ id: updated.id, ...updated.data() });
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local blog update ${postId}: ${error.message}`);
+    const idx = localBlogPosts.findIndex((p) => String(p.id) === String(postId));
+    if (idx < 0) throw error;
+    const updatedAt = new Date().toISOString();
+    localBlogPosts[idx] = { ...localBlogPosts[idx], ...postData, id: localBlogPosts[idx].id, updatedAt };
+    return localBlogPosts[idx];
+  }
 }
 
 export async function deleteBlogPost(postId) {
@@ -124,6 +159,14 @@ export async function deleteBlogPost(postId) {
     return { id: postId };
   }
 
-  await db.collection(COLLECTION).doc(postId).delete();
-  return { id: postId };
+  try {
+    await db.collection(COLLECTION).doc(postId).delete();
+    return { id: postId };
+  } catch (error) {
+    console.warn(`[FIREBASE] Fallback to local blog delete ${postId}: ${error.message}`);
+    const prev = localBlogPosts.length;
+    localBlogPosts = localBlogPosts.filter((p) => String(p.id) !== String(postId));
+    if (localBlogPosts.length === prev) throw error;
+    return { id: postId };
+  }
 }

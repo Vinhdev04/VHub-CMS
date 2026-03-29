@@ -12,7 +12,7 @@ import {
   TeamOutlined,
 } from '@ant-design/icons';
 import { hasSupabase } from '../config/supabase';
-import { useAuth } from '../shared/contexts/AuthContext';
+import { useAuth } from '../shared/contexts/auth-context';
 import { ROUTES } from '../shared/constants/routes';
 
 const FEATURES = [

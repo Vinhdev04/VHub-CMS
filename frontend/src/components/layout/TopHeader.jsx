@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BellOutlined, PlusOutlined, SearchOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Avatar, Breadcrumb, Button, Dropdown, Input, Space, Typography } from 'antd';
-import { useAuth } from '../../shared/contexts/AuthContext';
+import { useAuth } from '../../shared/contexts/auth-context';
 import { SIDEBAR_NAV } from '../../shared/config/menu.config';
 import { ROUTES } from '../../shared/constants/routes';
 

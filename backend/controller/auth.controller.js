@@ -1,4 +1,4 @@
-import { env, hasAdminConfig } from '../config/env.js';
+import { env, hasAdminConfig, isAdminEmail } from '../config/env.js';
 import { successResponse } from '../helpers/apiResponse.js';
 import { getUserProfile, upsertUserProfile } from '../helpers/user.repository.js';
 
@@ -34,7 +34,7 @@ export async function adminLoginController(req, res, next) {
       return res.status(503).json({ ok: false, message: 'Tai khoan admin chua duoc cau hinh.' });
     }
 
-    if (email !== env.adminEmail.toLowerCase() || password !== env.adminPassword) {
+    if (!isAdminEmail(email) || password !== env.adminPassword) {
       return res.status(401).json({ ok: false, message: 'Sai thong tin dang nhap admin.' });
     }
 

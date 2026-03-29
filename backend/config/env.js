@@ -2,6 +2,17 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+function parseAdminEmails() {
+  const raw = process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || 'admin@devcms.io';
+
+  return raw
+    .split(',')
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+const adminEmails = parseAdminEmails();
+
 export const env = {
   port: process.env.PORT || 4000,
   supabaseUrl: process.env.SUPABASE_URL || '',
@@ -9,7 +20,8 @@ export const env = {
   firebaseProjectId: process.env.FIREBASE_PROJECT_ID || '',
   firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
   firebasePrivateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-  adminEmail: process.env.ADMIN_EMAIL || 'admin@devcms.io',
+  adminEmail: adminEmails[0] || 'admin@devcms.io',
+  adminEmails,
   adminPassword: process.env.ADMIN_PASSWORD || '',
 };
 
@@ -31,7 +43,12 @@ export const hasFirebaseConfig = Boolean(
 );
 
 export const hasAdminConfig = Boolean(
-  env.adminEmail &&
+  env.adminEmails.length > 0 &&
   env.adminPassword &&
   !env.adminPassword.includes('change_this_admin_password'),
 );
+
+export function isAdminEmail(email) {
+  const normalized = String(email || '').trim().toLowerCase();
+  return Boolean(normalized) && env.adminEmails.includes(normalized);
+}

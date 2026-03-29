@@ -1,5 +1,19 @@
-import { env, hasSupabaseConfig } from '../config/env.js';
+import { env, hasSupabaseConfig, isAdminEmail } from '../config/env.js';
 import { supabase } from '../lib/supabase.js';
+
+function extractSupabaseEmail(user) {
+  const candidates = [
+    user?.email,
+    user?.user_metadata?.email,
+    user?.user_metadata?.preferred_email,
+    ...(Array.isArray(user?.identities)
+      ? user.identities.map((identity) => identity?.identity_data?.email)
+      : []),
+  ];
+
+  const matched = candidates.find((value) => typeof value === 'string' && value.trim());
+  return String(matched || '').trim().toLowerCase();
+}
 
 export async function authMiddleware(req, res, next) {
   if (!hasSupabaseConfig || !supabase) {
@@ -31,10 +45,8 @@ export async function authMiddleware(req, res, next) {
       return res.status(401).json({ ok: false, message: 'Invalid or expired token' });
     }
 
-    const normalizedEmail = String(user.email || '').toLowerCase();
-    const adminEmail = String(env.adminEmail || '').toLowerCase();
-
-    if (!normalizedEmail || normalizedEmail !== adminEmail) {
+    const normalizedEmail = extractSupabaseEmail(user);
+    if (!isAdminEmail(normalizedEmail)) {
       return res.status(403).json({ ok: false, message: 'Tai khoan nay khong co quyen admin.' });
     }
 
