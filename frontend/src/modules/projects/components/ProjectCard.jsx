@@ -9,7 +9,7 @@ import { Button, Card, Popconfirm, Space, Tag, Typography } from "antd";
 
 const { Paragraph, Title } = Typography;
 
-function ProjectCard({ project, onEdit, onDelete }) {
+function ProjectCard({ project, onEdit, onDelete, onView }) {
   return (
     <Card
       className="project-card"
@@ -22,7 +22,9 @@ function ProjectCard({ project, onEdit, onDelete }) {
         </span>
       </div>
 
-      <Title level={4}>{project.name}</Title>
+      <Title level={4} style={{ cursor: 'pointer', marginBottom: 8 }} onClick={() => onView?.(project.id)}>
+        {project.name}
+      </Title>
       <Paragraph className="project-description">{project.description}</Paragraph>
 
       <Space wrap size={[6, 6]} className="project-tags">
@@ -32,6 +34,9 @@ function ProjectCard({ project, onEdit, onDelete }) {
       </Space>
 
       <div className="project-actions">
+        <Button onClick={() => onView?.(project.id)}>
+          Detail
+        </Button>
         <Button type="primary" icon={<LinkOutlined />} href={project.liveDemoUrl}>
           Live Demo
         </Button>

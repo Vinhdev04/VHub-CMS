@@ -1,28 +1,13 @@
-import { useMemo, useState } from "react";
-import AdminLayout from "./layouts/AdminLayout";
-import BlogPage from "./modules/blog/pages/BlogPage";
-import ProjectsPage from "./modules/projects/pages/ProjectsPage";
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './shared/contexts/AuthContext';
+import AppRouter from './routes/AppRouter';
 
-function App() {
-  const [activeKey, setActiveKey] = useState("projects");
-  const pageContent = useMemo(() => {
-    if (activeKey === "blog") {
-      return <BlogPage />;
-    }
-    if (activeKey === "account") {
-      return <div>Tính năng Tài khoản sẽ được cập nhật tiếp theo.</div>;
-    }
-    if (activeKey === "personnel") {
-      return <div>Tính năng Nhân sự sẽ được cập nhật tiếp theo.</div>;
-    }
-    return <ProjectsPage />;
-  }, [activeKey]);
-
+export default function App() {
   return (
-    <AdminLayout activeKey={activeKey} onMenuChange={setActiveKey}>
-      {pageContent}
-    </AdminLayout>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
-
-export default App;
