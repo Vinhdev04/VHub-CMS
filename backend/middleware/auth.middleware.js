@@ -47,6 +47,7 @@ export async function authMiddleware(req, res, next) {
 
     const normalizedEmail = extractSupabaseEmail(user);
     if (!isAdminEmail(normalizedEmail)) {
+      console.warn(`[AUTH] Truy cập bị từ chối cho email: ${normalizedEmail}. Vui lòng thêm email này vào ADMIN_EMAILS trong file .env.`);
       return res.status(403).json({ ok: false, message: 'Tai khoan nay khong co quyen admin.' });
     }
 
