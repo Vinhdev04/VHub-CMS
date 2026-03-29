@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spin, message } from 'antd';
+import { getMyProfile } from '../api/auth.api';
 import { supabase, hasSupabase } from '../config/supabase';
 import { ROUTES } from '../shared/constants/routes';
 
@@ -18,6 +19,15 @@ export default function AuthCallbackPage() {
 
       if (error || !data.session) {
         message.error(error?.message || 'Khong the xac minh dang nhap OAuth.');
+        navigate(ROUTES.LOGIN, { replace: true });
+        return;
+      }
+
+      try {
+        await getMyProfile();
+      } catch (profileError) {
+        await supabase.auth.signOut();
+        message.error(profileError.message || 'Tai khoan nay khong co quyen admin.');
         navigate(ROUTES.LOGIN, { replace: true });
         return;
       }

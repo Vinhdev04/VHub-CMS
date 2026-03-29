@@ -21,7 +21,7 @@ app.use('/api', apiRouter);
 
 app.use(express.static(frontendDistPath));
 
-app.get('*', (req, res, next) => {
+app.get('/{*path}', (req, res, next) => {
   if (req.path.startsWith('/api')) {
     return next();
   }

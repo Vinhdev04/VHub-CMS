@@ -113,3 +113,60 @@ Example CI/CD flow:
 docker build -t <dockerhub-username>/vhub-cms:latest .
 docker push <dockerhub-username>/vhub-cms:latest
 ```
+
+## Supabase Auth Setup
+
+Update local env:
+
+```bash
+backend/.env
+frontend/.env
+```
+
+Required values:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your_publishable_key
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_publishable_key
+ADMIN_EMAIL=your-admin-email@example.com
+```
+
+### Google Provider
+
+1. Open Supabase Dashboard.
+2. Go to `Authentication` -> `Providers`.
+3. Enable `Google`.
+4. In Google Cloud Console, create OAuth credentials for Web application.
+5. Add Supabase callback URL shown in provider screen into Google OAuth redirect URIs.
+6. Copy `Client ID` and `Client Secret` from Google Cloud into Supabase Google provider form.
+7. Save provider config.
+
+### GitHub Provider
+
+1. Open Supabase Dashboard.
+2. Go to `Authentication` -> `Providers`.
+3. Enable `GitHub`.
+4. In GitHub Developer Settings, create a new OAuth App.
+5. Set Authorization callback URL to the Supabase callback URL shown in provider screen.
+6. Copy `Client ID` and `Client Secret` from GitHub into Supabase GitHub provider form.
+7. Save provider config.
+
+### Redirect URLs
+
+Add these URLs in Supabase `Authentication` -> `URL Configuration`:
+
+```text
+http://localhost:5173
+http://localhost:5173/auth/callback
+http://localhost:4000
+http://localhost:4000/auth/callback
+```
+
+For production, add your deployed frontend domain and callback URL too.
+
+### Admin Access Rule
+
+Only the email configured in `ADMIN_EMAIL` can access the dashboard.
+If Google or GitHub login returns a different email, backend will reject it.

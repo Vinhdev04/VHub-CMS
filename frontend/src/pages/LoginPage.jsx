@@ -127,7 +127,7 @@ export default function LoginPage() {
           <div className="login-demo-note">
             <span style={{ color: '#ff7a1a' }}>i</span>
             {hasSupabase
-              ? 'Admin login dung email/password. OAuth dung Google hoac GitHub.'
+              ? 'Chi email admin trong backend moi duoc dang nhap bang email, Google hoac GitHub.'
               : 'Che do local: admin login dung tai khoan backend, Google/GitHub dung profile demo.'}
           </div>
 

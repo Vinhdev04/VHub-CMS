@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { adminLogin } from '../../api/auth.api';
+import { adminLogin, getMyProfile } from '../../api/auth.api';
 import { hasSupabase, supabase } from '../../config/supabase';
 
 const AuthContext = createContext(null);
@@ -54,15 +54,34 @@ export function AuthProvider({ children }) {
 
       if (!mounted) return;
 
-      if (session?.user) {
-        const nextUser = mapSupabaseUser(session.user, session.access_token);
-        setUser(nextUser);
-        persistUser(nextUser);
-      } else {
+      if (!session?.user) {
         setUser(null);
         clearUser();
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      try {
+        const nextUser = mapSupabaseUser(session.user, session.access_token);
+        persistUser(nextUser);
+        const profile = await getMyProfile();
+        const mergedUser = {
+          ...nextUser,
+          ...profile,
+          email: profile.email || nextUser.email,
+          name: profile.name || nextUser.name,
+          role: profile.role || nextUser.role,
+          avatar: profile.avatar || nextUser.avatar,
+        };
+        setUser(mergedUser);
+        persistUser(mergedUser);
+      } catch {
+        await supabase.auth.signOut();
+        setUser(null);
+        clearUser();
+      } finally {
+        setLoading(false);
+      }
     }
 
     bootstrapAuth();
@@ -70,14 +89,15 @@ export function AuthProvider({ children }) {
     let subscription;
     if (hasSupabase && supabase) {
       const listener = supabase.auth.onAuthStateChange((_event, session) => {
-        if (session?.user) {
-          const nextUser = mapSupabaseUser(session.user, session.access_token);
-          setUser(nextUser);
-          persistUser(nextUser);
-        } else {
+        if (!session?.user) {
           setUser(null);
           clearUser();
+          return;
         }
+
+        const nextUser = mapSupabaseUser(session.user, session.access_token);
+        setUser(nextUser);
+        persistUser(nextUser);
       });
       subscription = listener.data.subscription;
     }
@@ -112,8 +132,8 @@ export function AuthProvider({ children }) {
     if (!hasSupabase || !supabase) {
       const providerUser = {
         id: `demo:${provider}`,
-        email: `demo-${provider}@devcms.io`,
-        name: provider === 'github' ? 'GitHub Demo' : 'Google Demo',
+        email: 'admin@devcms.io',
+        name: provider === 'github' ? 'GitHub Admin' : 'Google Admin',
         role: 'Administrator',
         avatar: null,
         provider,

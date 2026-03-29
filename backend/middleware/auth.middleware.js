@@ -1,5 +1,5 @@
+import { env, hasSupabaseConfig } from '../config/env.js';
 import { supabase } from '../lib/supabase.js';
-import { hasSupabaseConfig } from '../config/env.js';
 
 export async function authMiddleware(req, res, next) {
   if (!hasSupabaseConfig || !supabase) {
@@ -31,9 +31,16 @@ export async function authMiddleware(req, res, next) {
       return res.status(401).json({ ok: false, message: 'Invalid or expired token' });
     }
 
+    const normalizedEmail = String(user.email || '').toLowerCase();
+    const adminEmail = String(env.adminEmail || '').toLowerCase();
+
+    if (!normalizedEmail || normalizedEmail !== adminEmail) {
+      return res.status(403).json({ ok: false, message: 'Tai khoan nay khong co quyen admin.' });
+    }
+
     req.user = {
       id: user.id,
-      email: user.email,
+      email: normalizedEmail,
       name: user.user_metadata?.full_name || user.user_metadata?.name || '',
       avatar: user.user_metadata?.avatar_url || '',
       provider: user.app_metadata?.provider || 'email',
