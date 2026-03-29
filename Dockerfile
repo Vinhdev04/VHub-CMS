@@ -1,18 +1,26 @@
-# Build frontend
-FROM node:18-alpine AS frontend-builder
+# Build Frontend
+FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
 RUN npm run build
 
-# Build backend
-FROM node:18-alpine
+# Build Backend & Combine
+FROM node:20-alpine
+WORKDIR /app/backend
+COPY backend/package*.json ./
+RUN npm install
+
 WORKDIR /app
-COPY backend/package*.json ./backend/
-RUN npm install --prefix backend
 COPY backend/ ./backend/
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-EXPOSE 5000
-CMD ["npm", "start", "--prefix", "backend"]
+# Set env
+ENV NODE_ENV=production
+ENV PORT=4000
+
+# Start server
+WORKDIR /app/backend
+EXPOSE 4000
+CMD ["node", "server.js"]
