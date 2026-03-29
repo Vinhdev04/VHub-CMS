@@ -16,15 +16,17 @@ export default function AuthCallbackPage() {
       }
 
       const { data, error } = await supabase.auth.getSession();
+      const session = data.session;
 
-      if (error || !data.session) {
+      if (error || !session) {
         message.error(error?.message || 'Khong the xac minh dang nhap OAuth.');
         navigate(ROUTES.LOGIN, { replace: true });
         return;
       }
 
       try {
-        await getMyProfile();
+        // Gửi token trực tiếp để tránh lỗi đồng bộ cache
+        await getMyProfile(session.access_token);
       } catch (profileError) {
         await supabase.auth.signOut();
         message.error(profileError.message || 'Tai khoan nay khong co quyen admin.');

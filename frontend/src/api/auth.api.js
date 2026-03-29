@@ -63,8 +63,8 @@ export async function adminLogin(data) {
   return request('/auth/admin-login', { method: 'POST', body: JSON.stringify(data) });
 }
 
-export async function getMyProfile() {
-  return request('/auth/me');
+export async function getMyProfile(manualToken = null) {
+  return request('/auth/me', manualToken ? { headers: { Authorization: `Bearer ${manualToken}` } } : {});
 }
 
 export async function updateMyProfile(data) {
