@@ -256,3 +256,28 @@ VITE_API_BASE_URL=https://your-backend-service.onrender.com
 VITE_SUPABASE_URL=https://wkicfgmxyfwgmnplchmg.supabase.co
 VITE_SUPABASE_ANON_KEY=sb_publishable_elv4WKICRFi5ao9EietL_w_zeBueNAI
 ```
+
+## Production Auth Test
+
+Use the checklist in [production-auth-checklist.md](/d:/VHub-CMS-clean/docs/production-auth-checklist.md).
+
+## GitHub Actions Auto Deploy
+
+This repo now includes:
+
+- [.github/workflows/netlify-deploy.yml](/d:/VHub-CMS-clean/.github/workflows/netlify-deploy.yml)
+- [.github/workflows/render-deploy.yml](/d:/VHub-CMS-clean/.github/workflows/render-deploy.yml)
+
+Required GitHub repository secrets:
+
+```text
+NETLIFY_AUTH_TOKEN
+NETLIFY_SITE_ID
+VITE_API_BASE_URL
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+RENDER_DEPLOY_HOOK_URL
+```
+
+Render deploy uses a deploy hook URL.
+Netlify deploy builds `frontend` and publishes `frontend/dist`.
