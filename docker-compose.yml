@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  vhub-cms:
+    container_name: vhub-cms
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+    env_file:
+      - ./backend/.env
+    ports:
+      - "${PORT:-4000}:4000"
+    restart: unless-stopped

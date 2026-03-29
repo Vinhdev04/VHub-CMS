@@ -24,16 +24,12 @@ frontend/
     styles/                 # Global stylesheet
 
 backend/
-  src/
-    config/                 # Environment and Supabase clients
-    modules/projects/       # Feature module: projects API
-      projects.routes.js
-      projects.controller.js
-      projects.service.js
-      projects.repository.js
-    shared/
-      middlewares/          # App middlewares
-      utils/                # Shared helpers
+  config/                   # Environment config
+  controller/               # Route controllers
+  helpers/                  # Services, repositories, mocks
+  lib/                      # Firebase and Supabase clients
+  middleware/               # App middlewares
+  routes/                   # Express routes
 ```
 
 ## Run Frontend
@@ -70,3 +66,50 @@ npm run dev
 - `POST /api/blog-posts`
 - `PUT /api/blog-posts/:id`
 - `DELETE /api/blog-posts/:id`
+
+## Docker
+
+Build image:
+
+```bash
+docker build -t vhub-cms .
+```
+
+Run container:
+
+```bash
+docker run -p 4000:4000 --env-file backend/.env vhub-cms
+```
+
+Run with Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+## Docker Hub
+
+Login:
+
+```bash
+docker login
+```
+
+Tag image:
+
+```bash
+docker tag vhub-cms <dockerhub-username>/vhub-cms:latest
+```
+
+Push image:
+
+```bash
+docker push <dockerhub-username>/vhub-cms:latest
+```
+
+Example CI/CD flow:
+
+```bash
+docker build -t <dockerhub-username>/vhub-cms:latest .
+docker push <dockerhub-username>/vhub-cms:latest
+```
