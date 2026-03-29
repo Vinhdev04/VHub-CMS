@@ -1,4 +1,9 @@
-**VHub CMS (Developer Workspace Dashboard)**
+<p align="center">
+  <img src="frontend/src/assets/images/devCMS.png" alt="VHub CMS Dashboard" width="100%">
+</p>
+
+# VHub CMS (Developer Workspace Dashboard)
+
 
 **Position:** Fullstack Developer (Personal)
 
