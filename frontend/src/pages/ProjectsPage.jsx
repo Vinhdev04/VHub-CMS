@@ -9,6 +9,7 @@ import {
   AppstoreFilled,
   UnorderedListOutlined,
 } from '@ant-design/icons';
+import { motion } from 'framer-motion';
 import ProjectsGrid from '../components/projects/ProjectsGrid';
 import ProjectFormModal from '../components/projects/ProjectFormModal';
 import { useProjects } from '../hooks/useProjects';
@@ -30,6 +31,7 @@ export default function ProjectsPage() {
   const [editingProject, setEditingProject]  = useState(null);
   const [statusFilter,   setStatusFilter]   = useState('all');
   const [sortOrder,      setSortOrder]       = useState('newest');
+  const [visibleItems,   setVisibleItems]   = useState(6);
 
   // Listen for header "Add Project" button event
   useEffect(() => {
@@ -44,13 +46,24 @@ export default function ProjectsPage() {
   const inProgCount  = projects.filter((p) => p.status === 'In Progress').length;
 
   // Filtered + sorted list
-  const displayed = projects
+  const filtered = projects
     .filter((p) => statusFilter === 'all' || p.status === statusFilter)
     .sort((a, b) => {
       if (sortOrder === 'stars')  return b.stars - a.stars;
       if (sortOrder === 'oldest') return a.id.localeCompare(b.id);
       return b.id.localeCompare(a.id); // newest first (by id string)
     });
+
+  const displayed = filtered.slice(0, visibleItems);
+  const hasMore = visibleItems < filtered.length;
+
+  const loadMore = () => {
+    setSubmitting(true);
+    setTimeout(() => {
+        setVisibleItems(prev => prev + 6);
+        setSubmitting(false);
+    }, 400); // Simulate network delay for effects
+  };
 
   function openCreateModal() {
     setEditingProject(null);
@@ -100,16 +113,22 @@ export default function ProjectsPage() {
     <div className="animate-fade-in-up">
       {/* Stat Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        {STATS.map((s) => (
+        {STATS.map((s, idx) => (
           <Col key={s.label} xs={24} sm={12} xl={6}>
-            <div className="stat-card">
+            <motion.div 
+               className="stat-card"
+               initial={{ opacity: 0, x: -20 }}
+               animate={{ opacity: 1, x: 0 }}
+               transition={{ delay: idx * 0.1 }}
+               whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
+            >
               <div className={`stat-card-icon ${s.colorClass}`}>{s.icon}</div>
               <div className="stat-card-body">
                 <div className="stat-card-label">{s.label}</div>
                 <div className="stat-card-value">{s.value}</div>
                 <div className="stat-card-sub">{s.sub}</div>
               </div>
-            </div>
+            </motion.div>
           </Col>
         ))}
       </Row>
@@ -160,9 +179,11 @@ export default function ProjectsPage() {
 
       <ProjectsGrid
         projects={displayed}
-        loading={loading}
+        loading={loading || (submitting && visibleItems > 6)}
         onEdit={openEditModal}
         onDelete={handleDelete}
+        hasMore={hasMore}
+        loadMore={loadMore}
       />
 
       <ProjectFormModal

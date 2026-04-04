@@ -9,6 +9,7 @@ import {
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 import BlogFormModal from '../components/blog/BlogFormModal';
 import { useBlogPosts } from '../hooks/useBlogPosts';
 
@@ -144,23 +145,35 @@ export default function BlogPage() {
     <div className="animate-fade-in-up">
       {/* Stat Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        {STATS.map((s) => (
+        {STATS.map((s, idx) => (
           <Col key={s.label} xs={24} sm={12} xl={6}>
-            <div className="stat-card">
+            <motion.div 
+               className="stat-card"
+               initial={{ opacity: 0, scale: 0.9 }}
+               animate={{ opacity: 1, scale: 1 }}
+               transition={{ delay: idx * 0.1 }}
+               whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
+            >
               <div className={`stat-card-icon ${s.colorClass}`}>{s.icon}</div>
               <div className="stat-card-body">
                 <div className="stat-card-label">{s.label}</div>
                 <div className="stat-card-value">{s.value}</div>
                 <div className="stat-card-sub">{s.sub}</div>
               </div>
-            </div>
+            </motion.div>
           </Col>
         ))}
       </Row>
 
       {/* Views by Published Post Chart */}
       {chartData.length > 0 && (
-        <div className="chart-card" style={{ marginBottom: 20 }}>
+        <motion.div 
+           className="chart-card" 
+           style={{ marginBottom: 20 }}
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.4 }}
+        >
           <div className="chart-card-title">Views by Published Post</div>
           <div className="chart-card-sub">Total views comparison across published articles</div>
           <ResponsiveContainer width="100%" height={220}>
@@ -175,7 +188,7 @@ export default function BlogPage() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       )}
 
       {/* Table Header */}
